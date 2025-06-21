@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Tutorials - WSG{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold text-gradient">
+                        <i class="fas fa-book me-2"></i>Programming Tutorials
+                    </h1>
+                    <p class="lead text-muted">Master programming languages with structured lessons and hands-on practice</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Language Selector -->
+        <div class="col-lg-3">
+            <div class="glass-card p-4 mb-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-layer-group me-2 text-primary"></i>
+                    Languages
+                </h4>
+                
+                <div class="language-selector">
+                    {% for language in languages %}
+                    <a href="{{ url_for('tutorials', lang=language.id) }}" 
+                       class="language-item d-block p-3 mb-2 rounded text-decoration-none {% if language.id == selected_lang %}active{% endif %}">
+                        <div class="d-flex align-items-center">
+                            <span class="language-icon me-3 fs-4">{{ language.icon }}</span>
+                            <div>
+                                <div class="fw-semibold">{{ language.name }}</div>
+                                <small class="text-muted">{{ language.description }}</small>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Progress Summary -->
+            <div class="glass-card p-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-chart-pie me-2 text-success"></i>
+                    Your Progress
+                </h4>
+                
+                <div class="progress-summary">
+                    <div class="text-center mb-3">
+                        <div class="progress-circle">
+                            <span class="display-6 fw-bold text-primary">
+                                {{ ((completed_lessons | length) / (lessons | length) * 100) | round | int if lessons else 0 }}%
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" 
+                             style="width: {{ ((completed_lessons | length) / (lessons | length) * 100) if lessons else 0 }}%"></div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            {{ completed_lessons | length }} of {{ lessons | length }} lessons completed
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Content -->
+        <div class="col-lg-9">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold">
+                        <span class="me-2">{{ languages | selectattr('id', 'equalto', selected_lang) | map(attribute='icon') | first }}</span>
+                        {{ languages | selectattr('id', 'equalto', selected_lang) | map(attribute='name') | first }} Lessons
+                    </h3>
+                    <div class="text-muted">
+                        <small>{{ lessons | length }} lessons available</small>
+                    </div>
+                </div>
+
+                {% if lessons %}
+                <div class="lessons-grid">
+                    {% for lesson in lessons %}
+                    <div class="lesson-card p-4 mb-3 border rounded position-relative">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="lesson-content flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h5 class="fw-bold mb-0">{{ lesson.title }}</h5>
+                                    {% if lesson.id in completed_lessons %}
+                                    <span class="badge bg-success ms-2">
+                                        <i class="fas fa-check me-1"></i>Completed
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p class="text-muted mb-3">{{ lesson.description }}</p>
+                                
+                                <div class="lesson-meta d-flex align-items-center">
+                                    <span class="badge bg-{{ 'success' if lesson.difficulty == 'Beginner' else 'warning' if lesson.difficulty == 'Intermediate' else 'danger' }} me-2">
+                                        {{ lesson.difficulty }}
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>~30 minutes
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="lesson-actions ms-3">
+                                <a href="{{ url_for('editor', lang=selected_lang, lesson=lesson.id) }}" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-play me-1"></i>
+                                    {% if lesson.id in completed_lessons %}Review{% else %}Start{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <h4>No lessons available</h4>
+                    <p class="text-muted">Lessons for this language are coming soon!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.language-item {
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.language-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+    transform: translateY(-2px);
+}
+
+.language-item.active {
+    background: rgba(var(--bs-primary-rgb), 0.2);
+    border-color: var(--bs-primary);
+}
+
+.lesson-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.3s ease;
+}
+
+.lesson-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.progress-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(var(--bs-success) {{ ((completed_lessons | length) / (lessons | length) * 360) if lessons else 0 }}deg, rgba(255, 255, 255, 0.1) 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

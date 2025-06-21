@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Wolf Shell Generator (WSG) - Educational Programming Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center min-vh-100">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold text-gradient mb-4 animate-fade-in">
+                        Wolf Shell Generator
+                        <span class="text-primary">(WSG)</span>
+                    </h1>
+                    <p class="lead mb-4 animate-fade-in-delay-1">
+                        A comprehensive educational platform for learning programming languages and cybersecurity concepts. 
+                        Master multiple programming languages with interactive tutorials and hands-on coding experience.
+                    </p>
+                    <div class="hero-features mb-4 animate-fade-in-delay-2">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="feature-item glass-card p-3">
+                                    <i class="fas fa-code text-primary me-2"></i>
+                                    <span>Interactive Code Editor</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="feature-item glass-card p-3">
+                                    <i class="fas fa-shield-alt text-success me-2"></i>
+                                    <span>Cybersecurity Focus</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="feature-item glass-card p-3">
+                                    <i class="fas fa-graduation-cap text-warning me-2"></i>
+                                    <span>Progressive Learning</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="feature-item glass-card p-3">
+                                    <i class="fas fa-users text-info me-2"></i>
+                                    <span>Professional Community</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions animate-fade-in-delay-3">
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg me-3 glass-btn">
+                            <i class="fas fa-rocket me-2"></i>Enter Platform
+                        </a>
+                        <a href="{{ url_for('editor') }}" class="btn btn-outline-light btn-lg glass-btn">
+                            <i class="fas fa-code me-2"></i>Start Coding
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg me-3 glass-btn">
+                            <i class="fas fa-chart-line me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('editor') }}" class="btn btn-outline-light btn-lg glass-btn">
+                            <i class="fas fa-code me-2"></i>Start Coding
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual animate-fade-in-delay-2">
+                    <div class="glass-card p-4 code-preview">
+                        <div class="code-header mb-3">
+                            <span class="text-success">WSG Terminal</span>
+                            <div class="float-end">
+                                <span class="traffic-light bg-danger"></span>
+                                <span class="traffic-light bg-warning"></span>
+                                <span class="traffic-light bg-success"></span>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre class="text-light mb-0"><code># Welcome to Wolf Shell Generator
+def learn_programming():
+    languages = ['Python', 'JavaScript', 'C++', 'Bash']
+    for lang in languages:
+        print(f"Learning {lang}...")
+        master_skills(lang)
+    
+    print("🎉 Ready for cybersecurity!")
+
+# Start your journey
+learn_programming()</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-gradient">Why Choose WSG?</h2>
+            <p class="lead">Comprehensive learning platform designed by cybersecurity professionals</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card glass-card p-4 h-100 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-laptop-code fa-3x text-primary"></i>
+                    </div>
+                    <h4>Multi-Language Support</h4>
+                    <p class="text-muted">
+                        Learn Python, JavaScript, C/C++, Bash, and more with interactive tutorials 
+                        and real-time code execution.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card glass-card p-4 h-100 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-shield-halved fa-3x text-success"></i>
+                    </div>
+                    <h4>Cybersecurity Focus</h4>
+                    <p class="text-muted">
+                        Learn secure coding practices, vulnerability assessment, and ethical hacking 
+                        fundamentals from industry experts.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card glass-card p-4 h-100 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-chart-line fa-3x text-warning"></i>
+                    </div>
+                    <h4>Progress Tracking</h4>
+                    <p class="text-muted">
+                        Monitor your learning progress with detailed analytics, completion tracking, 
+                        and personalized recommendations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Languages Section -->
+<section class="languages-section py-5 bg-gradient">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-white">Supported Languages</h2>
+            <p class="lead text-light">Master the most important programming languages for cybersecurity</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-2 col-sm-4 col-6">
+                <div class="language-card glass-card p-3 text-center">
+                    <div class="language-icon mb-2">
+                        <i class="fab fa-python fa-2x text-primary"></i>
+                    </div>
+                    <h6 class="mb-0">Python</h6>
+                </div>
+            </div>
+            
+            <div class="col-md-2 col-sm-4 col-6">
+                <div class="language-card glass-card p-3 text-center">
+                    <div class="language-icon mb-2">
+                        <i class="fab fa-js-square fa-2x text-warning"></i>
+                    </div>
+                    <h6 class="mb-0">JavaScript</h6>
+                </div>
+            </div>
+            
+            <div class="col-md-2 col-sm-4 col-6">
+                <div class="language-card glass-card p-3 text-center">
+                    <div class="language-icon mb-2">
+                        <i class="fas fa-code fa-2x text-info"></i>
+                    </div>
+                    <h6 class="mb-0">C/C++</h6>
+                </div>
+            </div>
+            
+            <div class="col-md-2 col-sm-4 col-6">
+                <div class="language-card glass-card p-3 text-center">
+                    <div class="language-icon mb-2">
+                        <i class="fas fa-terminal fa-2x text-success"></i>
+                    </div>
+                    <h6 class="mb-0">Bash</h6>
+                </div>
+            </div>
+            
+            <div class="col-md-2 col-sm-4 col-6">
+                <div class="language-card glass-card p-3 text-center">
+                    <div class="language-icon mb-2">
+                        <i class="fas fa-plus fa-2x text-secondary"></i>
+                    </div>
+                    <h6 class="mb-0">More Soon</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container text-center">
+        <div class="glass-card p-5">
+            <h2 class="display-6 fw-bold text-gradient mb-3">Ready to Start Learning?</h2>
+            <p class="lead mb-4">
+                Access the complete cybersecurity programming platform instantly
+            </p>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg glass-btn me-3">
+                <i class="fas fa-rocket me-2"></i>Enter Platform
+            </a>
+            <a href="{{ url_for('editor') }}" class="btn btn-outline-primary btn-lg glass-btn">
+                <i class="fas fa-code me-2"></i>Start Coding Now
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

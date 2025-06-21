@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Code Editor - WSG{% endblock %}
+
+{% block extra_css %}
+<style>
+    .CodeMirror {
+        height: 400px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    
+    .output-section {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 10px;
+        color: #00ff00;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        min-height: 200px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold text-gradient">
+                        <i class="fas fa-code me-2"></i>Interactive Code Editor
+                    </h1>
+                    <p class="lead text-muted">Write, test, and execute code in multiple programming languages</p>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle glass-btn" data-bs-toggle="dropdown">
+                            <i class="fas fa-language me-2"></i>{{ selected_lang.title() }}
+                        </button>
+                        <ul class="dropdown-menu glass-dropdown">
+                            {% for lang in languages %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('editor', lang=lang.id) }}">
+                                    <span class="me-2">{{ lang.icon }}</span>{{ lang.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Code Editor Section -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold mb-0">
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                        Code Editor - {{ selected_lang.title() }}
+                    </h4>
+                    <div class="editor-controls">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-2" onclick="clearEditor()">
+                            <i class="fas fa-trash me-1"></i>Clear
+                        </button>
+                        <button type="button" class="btn btn-sm btn-warning me-2" onclick="analyzeCode()">
+                            <i class="fas fa-robot me-1"></i>AI Analyze
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="executeCode()">
+                            <i class="fas fa-play me-1"></i>Run Code
+                        </button>
+                    </div>
+                </div>
+                
+                <form id="codeForm" method="POST" action="{{ url_for('execute_code') }}">
+                    <input type="hidden" name="language" value="{{ selected_lang }}">
+                    <textarea id="codeEditor" name="code" placeholder="Write your {{ selected_lang }} code here...">{% if lesson_content %}{{ lesson_content.example_code }}{% else %}{% if selected_lang == 'python' %}print("Hello, WSG!"){% elif selected_lang == 'javascript' %}console.log("Hello, WSG!");{% elif selected_lang == 'bash' %}echo "Hello, WSG!"{% elif selected_lang == 'c' %}printf("Hello, WSG!\n");{% elif selected_lang == 'cpp' %}cout << "Hello, WSG!" << endl;{% endif %}{% endif %}</textarea>
+                </form>
+                
+                <!-- Hidden form for AI analysis -->
+                <form id="aiAnalysisForm" method="POST" action="{{ url_for('ai_analyze') }}" style="display: none;">
+                    <input type="hidden" name="language" value="{{ selected_lang }}">
+                    <textarea name="code"></textarea>
+                </form>
+            </div>
+
+            <!-- Output Section -->
+            <div class="glass-card p-4 mt-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-terminal me-2 text-success"></i>
+                    Output
+                </h4>
+                
+                <div id="output" class="output-section p-3">
+                    {% if session.last_execution %}
+                        {% set result = session.last_execution %}
+                        {% if result.output %}
+                            <div class="text-success">
+                                <strong>Output:</strong><br>
+                                <pre class="mb-0">{{ result.output }}</pre>
+                            </div>
+                        {% endif %}
+                        
+                        {% if result.error %}
+                            <div class="text-danger mt-2">
+                                <strong>Error:</strong><br>
+                                <pre class="mb-0">{{ result.error }}</pre>
+                            </div>
+                        {% endif %}
+                        
+                        {% if result.execution_time %}
+                            <div class="text-info mt-2">
+                                <small>Execution time: {{ "%.3f" | format(result.execution_time) }} seconds</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if result.ai_analysis %}
+                            <div class="mt-3 p-3 glass-card">
+                                <h6 class="text-warning mb-2">
+                                    <i class="fas fa-robot me-2"></i>Gemini AI Analysis
+                                </h6>
+                                <div class="ai-analysis-content">
+                                    {% if result.ai_analysis.analysis %}
+                                        <div class="mb-2">
+                                            <pre class="text-light bg-transparent border-0 p-0 mb-0" style="white-space: pre-wrap;">{{ result.ai_analysis.analysis }}</pre>
+                                        </div>
+                                    {% endif %}
+                                    {% if result.ai_analysis.enhancement %}
+                                        <div class="mb-2">
+                                            <pre class="text-light bg-transparent border-0 p-0 mb-0" style="white-space: pre-wrap;">{{ result.ai_analysis.enhancement }}</pre>
+                                        </div>
+                                    {% endif %}
+                                    {% if result.ai_analysis.debug_help %}
+                                        <div class="mb-2">
+                                            <pre class="text-danger bg-transparent border-0 p-0 mb-0" style="white-space: pre-wrap;">{{ result.ai_analysis.debug_help }}</pre>
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        <i class="fas fa-sparkles me-1"></i>Powered by Google Gemini AI
+                                    </small>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-play-circle fa-2x mb-2"></i><br>
+                            Click "Run Code" to see output and AI analysis here
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            {% if lesson_content %}
+            <!-- Lesson Content -->
+            <div class="glass-card p-4 mb-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-book me-2 text-warning"></i>
+                    {{ lesson_content.title }}
+                </h4>
+                
+                <div class="lesson-content">
+                    <div class="theory-section mb-3">
+                        <div class="content-text" style="max-height: 300px; overflow-y: auto;">
+                            {{ lesson_content.theory | safe }}
+                        </div>
+                    </div>
+                    
+                    {% if lesson_content.exercise %}
+                    <div class="exercise-section">
+                        <h6 class="fw-bold text-primary">Exercise:</h6>
+                        <p class="text-muted">{{ lesson_content.exercise }}</p>
+                        
+                        <form method="POST" action="{{ url_for('mark_lesson_complete') }}" class="mt-3">
+                            <input type="hidden" name="language" value="{{ selected_lang }}">
+                            <input type="hidden" name="lesson_id" value="{{ request.args.get('lesson') }}">
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check me-1"></i>Mark Complete
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Language Reference -->
+            <div class="glass-card p-4 mb-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-info-circle me-2 text-info"></i>
+                    {{ selected_lang.title() }} Reference
+                </h4>
+                
+                <div class="reference-content">
+                    {% if selected_lang == 'python' %}
+                    <div class="code-examples">
+                        <h6>Basic Syntax:</h6>
+                        <pre class="bg-dark text-light p-2 rounded"><code># Variables
+name = "WSG"
+age = 25
+
+# Functions
+def greet(name):
+    return f"Hello, {name}!"
+
+# Loops
+for i in range(5):
+    print(i)</code></pre>
+                    </div>
+                    {% elif selected_lang == 'javascript' %}
+                    <div class="code-examples">
+                        <h6>Basic Syntax:</h6>
+                        <pre class="bg-dark text-light p-2 rounded"><code>// Variables
+let name = "WSG";
+const age = 25;
+
+// Functions
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+// Loops
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}</code></pre>
+                    </div>
+                    {% elif selected_lang == 'bash' %}
+                    <div class="code-examples">
+                        <h6>Basic Syntax:</h6>
+                        <pre class="bg-dark text-light p-2 rounded"><code>#!/bin/bash
+
+# Variables
+name="WSG"
+age=25
+
+# Functions
+greet() {
+    echo "Hello, $1!"
+}
+
+# Loops
+for i in {1..5}; do
+    echo $i
+done</code></pre>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glass-card p-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-bolt me-2 text-warning"></i>
+                    Quick Actions
+                </h4>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('tutorials', lang=selected_lang) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-book me-2"></i>View Tutorials
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="loadExample()">
+                        <i class="fas fa-lightbulb me-2"></i>Load Example
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+{% endblock %}

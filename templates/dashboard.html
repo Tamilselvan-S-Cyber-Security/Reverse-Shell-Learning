@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - WSG{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold text-gradient">Welcome back, {{ current_user.username }}!</h1>
+                    <p class="lead text-muted">Track your learning progress and continue your cybersecurity journey</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('editor') }}" class="btn btn-primary glass-btn">
+                        <i class="fas fa-code me-2"></i>Start Coding
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stats-card glass-card p-4 text-center">
+                <div class="stats-icon mb-3">
+                    <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                </div>
+                <h3 class="fw-bold">{{ user_progress.values() | map(attribute='completed') | sum }}</h3>
+                <p class="text-muted mb-0">Lessons Completed</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stats-card glass-card p-4 text-center">
+                <div class="stats-icon mb-3">
+                    <i class="fas fa-code fa-2x text-success"></i>
+                </div>
+                <h3 class="fw-bold">{{ languages | length }}</h3>
+                <p class="text-muted mb-0">Languages Available</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stats-card glass-card p-4 text-center">
+                <div class="stats-icon mb-3">
+                    <i class="fas fa-play fa-2x text-warning"></i>
+                </div>
+                <h3 class="fw-bold">{{ recent_executions | length }}</h3>
+                <p class="text-muted mb-0">Recent Executions</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stats-card glass-card p-4 text-center">
+                <div class="stats-icon mb-3">
+                    <i class="fas fa-shield-alt fa-2x text-info"></i>
+                </div>
+                <h3 class="fw-bold">Advanced</h3>
+                <p class="text-muted mb-0">Current Level</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Progress -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="glass-card p-4 mb-4">
+                <h3 class="fw-bold mb-4">
+                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                    Learning Progress
+                </h3>
+                
+                <div class="row g-3">
+                    {% for language in languages %}
+                    <div class="col-md-6">
+                        <div class="progress-item p-3 border rounded">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="language-icon me-2">{{ language.icon }}</span>
+                                    <strong>{{ language.name }}</strong>
+                                </div>
+                                <span class="badge bg-primary">
+                                    {{ "%.1f" | format(user_progress[language.id].percentage) }}%
+                                </span>
+                            </div>
+                            
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar bg-gradient" 
+                                     style="width: {{ user_progress[language.id].percentage }}%"></div>
+                            </div>
+                            
+                            <small class="text-muted">
+                                {{ user_progress[language.id].completed }} of {{ user_progress[language.id].total }} lessons completed
+                            </small>
+                            
+                            <div class="mt-2">
+                                <a href="{{ url_for('tutorials', lang=language.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    Continue Learning
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Recent Activity -->
+            <div class="glass-card p-4 mb-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-history me-2 text-success"></i>
+                    Recent Activity
+                </h4>
+                
+                {% if recent_executions %}
+                <div class="activity-list">
+                    {% for execution in recent_executions %}
+                    <div class="activity-item p-3 mb-2 border rounded">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold">{{ execution.language.title() }} Code</div>
+                                <small class="text-muted">
+                                    {{ execution.executed_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if not execution.error else 'danger' }}">
+                                {{ 'Success' if not execution.error else 'Error' }}
+                            </span>
+                        </div>
+                        {% if execution.execution_time %}
+                        <small class="text-muted">
+                            Executed in {{ "%.2f" | format(execution.execution_time) }}s
+                        </small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-code fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent code executions</p>
+                    <a href="{{ url_for('editor') }}" class="btn btn-outline-primary btn-sm">
+                        Start Coding
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="glass-card p-4">
+                <h4 class="fw-bold mb-3">
+                    <i class="fas fa-bolt me-2 text-warning"></i>
+                    Quick Actions
+                </h4>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('tutorials') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-book me-2"></i>Browse Tutorials
+                    </a>
+                    <a href="{{ url_for('editor') }}" class="btn btn-outline-success">
+                        <i class="fas fa-play me-2"></i>Code Playground
+                    </a>
+                    <a href="{{ url_for('tutorials', lang='python') }}" class="btn btn-outline-info">
+                        <i class="fab fa-python me-2"></i>Python Lessons
+                    </a>
+                    <a href="{{ url_for('tutorials', lang='javascript') }}" class="btn btn-outline-warning">
+                        <i class="fab fa-js-square me-2"></i>JavaScript Lessons
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

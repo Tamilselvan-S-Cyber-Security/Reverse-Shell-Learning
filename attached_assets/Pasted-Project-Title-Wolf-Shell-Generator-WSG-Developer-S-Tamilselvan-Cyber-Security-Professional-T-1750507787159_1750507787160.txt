@@ -1,0 +1,10 @@
+Project Title: Wolf Shell Generator (WSG)
+Developer: S. Tamilselvan – Cyber Security Professional
+
+The Wolf Shell Generator (WSG) is a Python-based graphical user interface (GUI) tool designed as a powerful revision and exploitation platform. It serves dual functionality — acting as both an educational tool for learning all major programming languages and a professional-grade reverse shell controller. Developed using Flask, the application adopts a modern, glassy theme to offer a visually appealing and responsive user interface. The programming revision module is structured to support division-based categorization such as basic, intermediate, and advanced levels. It supports syntax highlighting, live previews, and multilingual code input (Python, Java, C++, JavaScript, and more), enabling users to revise or practice concepts interactively.
+
+Beyond its educational use, WSG is embedded with a highly secure and fully functional reverse shell engine. This shell provides 100% control over target systems once connected, allowing users to access directories, execute scripts, upload files, gain root access, and run custom payloads. All functionalities are integrated into a secure GUI, enabling full remote administration. The shell includes support for live command execution, file system navigation, encrypted communication, and real-time monitoring — such as keystroke logging, screen capturing, and script injections — strictly intended for ethical and authorized use.
+
+The application is built on a Flask backend and designed with Tailwind CSS or Bootstrap for its sleek, glassy aesthetic. The project is intended for cybersecurity experts, ethical hackers, and learners who want to blend learning and penetration testing in one single tool. The modularity and extensibility of the WSG platform allow for future upgrades such as AES/RSA encrypted channels, AI-assisted command prediction, multi-platform payload generation, and GUI-based rooted file explorers.
+
+In summary, WSG is not just a tool — it's an integrated cybersecurity and coding revision platform that merges convenience, design, and power into a single unified system.
